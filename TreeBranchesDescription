@@ -1,0 +1,47 @@
+  -----  Variables Generales  ------------------------------ 
+     runNr     = Numero de Run
+     eventNr   = Numero de suceso
+     eventType = SinRelevancia
+  -----          Hits         ------------------------------ 
+     Nhit = Numero total de Hits
+   // Informacion para cada Hit
+   // Vectores entre 0 y Nhit
+     DHCALEvent.fUniqueID = SinRelevancia
+     DHCALEvent.fBits     = SinRelevancia
+     DHCALEvent.fX        = Posicion X del hit (en cm) 
+     DHCALEvent.fY        = Posicion Y del hit (en cm)  
+     DHCALEvent.fZ        = Posicion Z del hit (en cm)  
+     DHCALEvent.I         = Posicion X del hit (en numero de pad)
+     DHCALEvent.J         = Posicion Y del hit (en numero de pad)
+     DHCALEvent.K         = Posicion Z del hit (en numero de RPC)
+     DHCALEvent.fDif_id   = Identificador del DIF 
+     DHCALEvent.fAsic_id  = Identificador del ASIC para el DIF
+     DHCALEvent.fChan_id  = Idenfiticador del canal del ASIC
+     DHCALEvent.fTime     = Tiempo del hit
+     DHCALEvent.fThr      = Threshold level soprepasado 
+                          (en algunos datos creo que habia un error
+                          y estaban el 2 y el 3 (creo) intercambiados
+                          habra que comprobarlo)
+  -----       Clusters        ------------------------------ 
+   // Informacion de cada cluster
+   Clusters        =   Numero de clusters
+   // Vectores entre 0 y Clusters
+   NHitsCluster    =   Numero de hits en el cluster  
+   ChamberCluster  =   Camara del Cluster
+   XposCluster     =   Posicion X del cluster (en unidades de num pad)
+   YposCluster     =   Posicion Y del cluster (en unidades de num pad)
+   ZposCluster     =   Posicion Z del cluster (en unidades de num RPC)
+   XRMSposCluster  =   RMS en X de cada cluster   
+   YRMSposCluster  =   RMS en Y de cada cluster   
+
+   // Hits associados a cada cluster 
+   // Vector en 2 dimensiones
+   // La primera ==> Numero de Cluster asociado *entre 0 y Clusters
+   // La segunda ==> Numero de hits de ese cluster, entre 0 y NHitsCluster
+   //           Pero OJO!!!! Como no se puede hacer un vector de un vector
+   //           estan reservados SIEMPRE 200 (o lo que se ponga en el programa)
+   //           Estos valores en esta version se inicializan a -999
+  
+   XposHitsCluster =  Posicion X del cluster (en unidades de num pad)
+   YposHitsCluster =  Posicion Y del cluster (en unidades de num pad)
+   ZposHitsCluster =  Posicion Z del cluster (en unidades de num RPC)
