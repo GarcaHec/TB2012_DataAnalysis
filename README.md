@@ -6,4 +6,4 @@ The .root file is a sample of the data to run some tests if needed.
 
 To run the macro just open the .root file with root and then execute the macro using the command:
 
-.x "Path to macro"
+.x Path to macro
