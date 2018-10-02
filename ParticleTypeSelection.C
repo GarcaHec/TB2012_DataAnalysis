@@ -1,4 +1,4 @@
-void MuonSelection_NoDebug() 
+void ParticleTypeSelection() 
 {
 	const Int_t maxClusters = 1000;  	//Maximum number of clusters in the arrays per event
 	const Int_t maxHits = 10000;		//Maximum number of hits      ''
