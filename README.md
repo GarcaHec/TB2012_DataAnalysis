@@ -16,6 +16,13 @@ selected as beam particles.
 
 ---
 
+*ParticleTypeSelection.C*
+
+Separation between muons, remaining cosmic rays and the pion and electron cascades are done with this macro.
+(Half documented)
+
+---
+
 To run a macro just open the .root file with root and then execute the macro using the command:
 
 .x Path to macro
