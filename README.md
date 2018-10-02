@@ -19,3 +19,11 @@ selected as beam particles.
 To run a macro just open the .root file with root and then execute the macro using the command:
 
 .x Path to macro
+
+
+
+
+=============================================================================================================
+# EDITS:
+10/02/2018 -> Fixed a bug where *BeamParticleSelection_DataSorted.C* crashes if executed twice without 
+exiting root. Also now the program outputs how much evenets has eliminated. 
