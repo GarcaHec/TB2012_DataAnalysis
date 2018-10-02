@@ -1,4 +1,4 @@
-void ParticleSelectionSorted_NoDebug() 
+void BeamParticleSelection_DataSorted() 
 {
 	const Int_t maxClusters = 1000;        //Maximum number of clusters per event (to create the arrays), there are usually around 300 at 80 GeV.
 	const Int_t nRPCs = 48;		       //Number of RPCs (layers)
