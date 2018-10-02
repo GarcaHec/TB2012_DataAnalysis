@@ -1,4 +1,4 @@
-void BeamParticleSelection_DataSorted() 
+void ParticleSelectionSorted_NoDebug() 
 {
 	const Int_t maxClusters = 1000;        //Maximum number of clusters per event (to create the arrays), there are usually around 300 at 80 GeV.
 	const Int_t nRPCs = 48;		       //Number of RPCs (layers)
@@ -7,7 +7,10 @@ void BeamParticleSelection_DataSorted()
 
 	const Long64_t cnEntries = 999999;     //Maximum number of entries per event
 
-	TTree* hcal = (TTree*)gFile->Get("DHCALC");       //This Tree contains the data
+	const Double_t xUpperLimit = 1500;     //This is the upper limit in the X axis for the histogram, for high energies it has to be increased
+
+	TFile *dataFile = gFile;                             //Copy the data file direction to restore the scope when the macro ends
+	TTree* hcal = (TTree*)dataFile->Get("DHCALC");       //This Tree contains the data
 
 	Long64_t nEntries = hcal->GetEntries();
 
@@ -24,20 +27,20 @@ void BeamParticleSelection_DataSorted()
 	gStyle->SetOptStat(0);    //Removing the statistics box from the histograms
 
 	//Creation of the different histograms and the legend
-	TH1I *nHist = new TH1I("nHits", "nHits", 150, 0., 2500.); //This histogram holds the Nhit distribution of all events
+	TH1I *nHist = new TH1I("nHits", "nHits", 150, 0., xUpperLimit); //This histogram holds the Nhit distribution of all events
 	nHist->SetFillColor(kOrange);
 	nHist->SetLineColor(kOrange);
 	nHist->GetXaxis()->SetTitle("Nhit");
 	nHist->GetXaxis()->SetNdivisions(5,5,0);
 	nHist->GetYaxis()->SetTitle("Entries");
 
-	TH1I *nHitProb_Cosm = new TH1I("Cosmic&Problems", "Cosmic&Problems", 150, 0., 2500.); //Here all the noise, problematic events and some cosmic rays are stored
+	TH1I *nHitProb_Cosm = new TH1I("Cosmic&Problems", "Cosmic&Problems", 150, 0., xUpperLimit); //Here all the noise, problematic events and some cosmic rays are stored
 	nHitProb_Cosm->SetFillColor(kBlack);
 	nHitProb_Cosm->SetFillStyle(3005);
 	nHitProb_Cosm->SetLineColor(kBlack);
 	nHitProb_Cosm->SetLineWidth(3);
 
-	TH1I *nHitBeam = new TH1I("BeamParticles", "BeamParticles", 150, 0., 2500.);  //The beam particles plus the remaining cosmic rays are held in this histogram
+	TH1I *nHitBeam = new TH1I("BeamParticles", "BeamParticles", 150, 0., xUpperLimit);  //The beam particles plus the remaining cosmic rays are held in this histogram
 	nHitBeam->SetLineColor(kBlue);
 	nHitBeam->SetLineWidth(3);
 
@@ -46,12 +49,16 @@ void BeamParticleSelection_DataSorted()
 	legend->AddEntry(nHitProb_Cosm, "Nhit Prob + Cosmic");
 	legend->AddEntry(nHitBeam, "Nhit Beam Particles");
 
-	TString outputFileName = "/afs/ciemat.es/user/h/hectorgc/Documentos/Data/Processed/Processed_";    //Manually set the path and prefix to the output file name
+	TString outputFileName = "/afs/ciemat.es/user/h/hectorgc/Documentos/Data/Processed/Processed_";    //IMPORTANT: set the path and prefix to the output file name
 	outputFileName += gDirectory->GetName();             
 
 	//Output file whith the previous path where the cloneTree will be written
 	TFile* outputFile = new TFile(outputFileName, "recreate");
 	TTree *cloneTree = hcal->CloneTree(0);
+
+	Int_t nNotValidEvents = 0;      //This is to later check the percentage of events removed from the data
+
+	cout << "BEGIN" << endl;
 
 	for(Long64_t i = 0; i < nEntries; i++) {
 	  
@@ -74,6 +81,7 @@ void BeamParticleSelection_DataSorted()
 	    { 
 	      DisplayAdvance(i,nEntries);
 	      nHitProb_Cosm->Fill(nHit);
+	      nNotValidEvents++;
 	      continue;
 	    }
 
@@ -88,6 +96,7 @@ void BeamParticleSelection_DataSorted()
 	    {
 	      DisplayAdvance(i,nEntries);
 	      nHitProb_Cosm->Fill(nHit);
+	      nNotValidEvents++;
 	      continue;
 	    }
 
@@ -178,9 +187,10 @@ void BeamParticleSelection_DataSorted()
 	  //(A) If the conditions aren't fullfiled we remove this event
 	  if(nRPCsitB_10 < 4 || nRPCsitB_6 < 3)
 	    {
+	      DisplayAdvance(i, nEntries);
 	      nHitProb_Cosm->Fill(nHit);
+	      nNotValidEvents++;
 	      continue;
-
 	    }
 
 	  /* --------------------------------------------------------
@@ -202,6 +212,7 @@ void BeamParticleSelection_DataSorted()
 	    {
 	      DisplayAdvance(i,nEntries);
 	      nHitProb_Cosm->Fill(nHit);
+	      nNotValidEvents++;
 	      continue;
 	    }
 		
@@ -213,11 +224,16 @@ void BeamParticleSelection_DataSorted()
 		
 	}
 
+	cout << "END" << endl;
+
+	cout << nNotValidEvents/(Double_t)nEntries*100 << "% of the events removed." << endl;
+
 	//Write the new tree to the disk
 	cloneTree->Write();
 
 	//Creating a canvas and drawing the histograms and the legend into it
 	TCanvas *C1 = new TCanvas();
+	c1->SetLogy();
 	
 	nHist->DrawCopy();
 	nHitProb_Cosm->DrawCopy("same");
@@ -226,6 +242,8 @@ void BeamParticleSelection_DataSorted()
 
 	//Clearing the direction to read the branches from the tree because the variables will be eliminated when the function ends
 	hcal->ResetBranchAddresses();
+
+	dataFile->cd();      //Before ending the macro restore the working directory to to the data
 	
 	//Freeing the memory taken by the pointers before ending the function (The canvas is an exception because it is closed manually)
 	delete hcal;
@@ -241,6 +259,8 @@ void BeamParticleSelection_DataSorted()
 void DisplayAdvance(Int_t current, Int_t total)
 {
   Int_t dispCuantity = 10000;     //Every time this many events are proccessed display how much of the total is complete
+  
+  if(current == 0) { return; }
   if(current%dispCuantity == 0) { cout << current << " of " << total << endl;}
 }
 
